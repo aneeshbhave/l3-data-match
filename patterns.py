@@ -19,8 +19,14 @@ def find_pat_file(inp_path :str, pad :str = '', keep_special :bool = False, uniq
 
     return patterns
 
-def match_pat_dir():
-    ...
+def match_pat_dir(dir_path :str, patterns :list, format_func, keep_special = False) -> None:
+    if not exists(dir_path):
+        return
+
+    paths = glob(dir_path + "/*")
+    for path in paths:
+        if exists(path):
+            match_pat_file(path, patterns, format_func, keep_special)
 
 def match_pat_file(inp_path :str, patterns :list, format_func, keep_special = False) -> None:
     if not exists(inp_path):
