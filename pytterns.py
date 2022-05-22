@@ -1,5 +1,8 @@
 import ahocorasick
-from os.path import exists
+from os import listdir
+from os.path import isdir, isfile, join
+
+#TODO Add Comments
 
 class Matcher:
     patterns :list
@@ -22,12 +25,12 @@ class Matcher:
     def add_pat(self, inp :str, pad :str ='') -> None:
         self.patterns.append(self.__to_pat__(pad + inp + pad))
 
-    def match_pat(self, haystack :str, callback_func :str) -> None:
+    def match_pat(self, haystack :str, callback_func) -> None:
         if not len(self.patterns):
             return
 
         if callable(callback_func):
-            raise TypeError("Hello")
+            raise TypeError("callback_func must be a callable function.")
 
         pat_haystack = self.__to_pat__(haystack)
 
@@ -39,8 +42,9 @@ class Matcher:
         aho.make_automaton()
 
         for j, (idx, val) in aho.iter(pat_haystack):
-            i = j - len(val) + 1
-            callback_func(self.patterns[idx], i, j, haystack[i:j+1])
+            j += 1
+            i = j - len(val)
+            callback_func(self.patterns[idx], i, j, haystack[i:j])
 
     def __to_pat__(self, inp :str) -> str:
         pat = ""
@@ -66,19 +70,41 @@ class FMatcher(Matcher):
             keep_unique=keep_unique
             )
     
-    def f_add_patts(self, inp_path :str, pad :str = '') -> None:
-        if not exists(inp_path):
-            raise #TODO
+    def f_add_pat(self, f_path :str, pad :str = '') -> None:
+        lines = self.__f_get_data__(f_path, True)
+        for line in lines:
+            self.add_pat(line, pad)
 
-        with open(inp_path) as file:
-            lines = file.read().splitlines()
-            for line in lines:
-                self.add_pat(line, pad)
-            
         self.patterns = list(set(self.patterns)) if self.keep_unique else self.patterns
     
-    def f_match_pat(self, ):
-        ...
+    def dir_add_pat(self, dir_path :str, pad :str = '') -> None:
+        files = self.__dir_ls__(dir_path)
+
+        for file in files:
+            self.f_add_pat(file, pad)
+    
+    def f_match_pat(self, f_path :str, callback_func) -> None:
+        data = self.__f_get_data__(f_path, False)
+        pat_data = self.__to_pat__(pat_data)
+        self.match_pat(pat_data, callback_func)
+
+    
+    def dir_match_pat(self, dir_path :str, callback_func) -> None:
+        files = self.__dir_ls__(dir_path)
+
+        for file in files:
+            self.f_match_pat(file, callback_func)
+
+    def __f_get_data__(self, f_path :str, split :bool) -> list or str:
+        if not isfile(f_path):
+            raise OSError(f"Could not open file at \'{f_path}\'.")
+        with open(f_path) as file:
+            return file.read().splitlines() if split else file.read()
+    
+    def __dir_ls__(self, dir_path :str) -> list:
+        if not isdir(dir_path):
+            raise OSError(f"\'{dir_path}\' is not a valid directory.")
+        return [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
 
 if __name__ == "__main__":
     print("This is a module, import it in your own script and run it!")
