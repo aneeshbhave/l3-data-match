@@ -29,11 +29,10 @@ class Matcher:
         if not len(self.patterns):
             return
 
-        if callable(callback_func):
+        if not callable(callback_func):
             raise TypeError("callback_func must be a callable function.")
 
         pat_haystack = self.__to_pat__(haystack)
-
         aho = ahocorasick.Automaton()
 
         for idx, val in enumerate(self.patterns):
@@ -85,13 +84,12 @@ class FMatcher(Matcher):
     
     def f_match_pat(self, f_path :str, callback_func) -> None:
         data = self.__f_get_data__(f_path, False)
-        pat_data = self.__to_pat__(pat_data)
-        self.match_pat(pat_data, callback_func)
 
+        self.match_pat(data, callback_func)
     
     def dir_match_pat(self, dir_path :str, callback_func) -> None:
         files = self.__dir_ls__(dir_path)
-
+        
         for file in files:
             self.f_match_pat(file, callback_func)
 
@@ -104,7 +102,7 @@ class FMatcher(Matcher):
     def __dir_ls__(self, dir_path :str) -> list:
         if not isdir(dir_path):
             raise OSError(f"\'{dir_path}\' is not a valid directory.")
-        return [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
+        return [join(dir_path, f) for f in listdir(dir_path) if isfile(join(dir_path, f))]
 
 if __name__ == "__main__":
     print("This is a module, import it in your own script and run it!")
