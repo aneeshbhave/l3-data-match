@@ -3,8 +3,15 @@ from os import listdir
 from os.path import isdir, isfile, join
 
 #TODO Add Comments
+#TODO Add DocStrings
 
 class Matcher:
+    """
+    Matcher class with basic functionality to add patterns and search them in strings.
+
+    keep_special : Keep special characters instead of replacing them with SPECIAL constant
+    keep_unique : Remove duplicates when adding pattern
+    """
     patterns :list
     keep_special :bool
     keep_unique :bool
@@ -22,10 +29,20 @@ class Matcher:
     def __repr__(self):
         return str(self.patterns)
 
-    def add_pat(self, inp :str, pad :str ='') -> None:
+    def add_pat(self, inp :str, pad :str = '') -> None:
+        """
+        Convert a string to a matchable pattern and add it to the internal patterns list
+
+        pad : Pad input string with string i.e inp -> pad + inp + pad 
+        """
         self.patterns.append(self.__to_pat__(pad + inp + pad))
 
-    def match_pat(self, haystack :str, callback_func) -> None:
+    def match_pat(self, haystack :str, callback_func, file_name) -> None:
+        """
+        Find patterns in haysack. Patterns are obtained from the internal patterns array
+        
+        callback_function params := pattern_found, start_idx, end_idx, element_found
+        """
         if not len(self.patterns):
             return
 
@@ -43,7 +60,7 @@ class Matcher:
         for j, (idx, val) in aho.iter(pat_haystack):
             j += 1
             i = j - len(val)
-            callback_func(self.patterns[idx], i, j, haystack[i:j])
+            callback_func(self.patterns[idx], i, j, haystack[i:j], {file_name})
 
     def __to_pat__(self, inp :str) -> str:
         pat = ""
@@ -61,8 +78,20 @@ class Matcher:
                 pat += c if self.keep_special else self.SPECIAL
                 continue
         return pat
+    
+    def __rm_duplicates__(self):
+        self.patterns = list(set(self.patterns))
+
 
 class FMatcher(Matcher):
+    """
+    FMatcher class adds wrapper functions to interact with files.
+
+    Inherits from Matcher class
+
+    keep_special : Keep special characters instead of replacing them with SPECIAL constant
+    keep_unique : Remove duplicates when adding pattern
+    """
     def __init__(self, *, keep_special :bool, keep_unique :bool):
         super().__init__(
             keep_special=keep_special,
@@ -70,11 +99,13 @@ class FMatcher(Matcher):
             )
     
     def f_add_pat(self, f_path :str, pad :str = '') -> None:
+        """Hello world"""
         lines = self.__f_get_data__(f_path, True)
         for line in lines:
             self.add_pat(line, pad)
 
-        self.patterns = list(set(self.patterns)) if self.keep_unique else self.patterns
+        if self.keep_unique:
+            self.__rm_duplicates__()
     
     def dir_add_pat(self, dir_path :str, pad :str = '') -> None:
         files = self.__dir_ls__(dir_path)
@@ -83,11 +114,21 @@ class FMatcher(Matcher):
             self.f_add_pat(file, pad)
     
     def f_match_pat(self, f_path :str, callback_func) -> None:
+        """#TODO Write this again
+        Find patterns in haysack. Patterns are obtained from the internal patterns array
+        
+        callback_function params := pattern_found, start_idx, end_idx, element_found
+        """
         data = self.__f_get_data__(f_path, False)
 
-        self.match_pat(data, callback_func)
+        self.match_pat(data, callback_func, f_path)
     
     def dir_match_pat(self, dir_path :str, callback_func) -> None:
+        """#TODO Write this again
+        Find patterns in haysack. Patterns are obtained from the internal patterns array
+        
+        callback_function params := pattern_found, start_idx, end_idx, element_found
+        """
         files = self.__dir_ls__(dir_path)
         
         for file in files:
@@ -106,10 +147,4 @@ class FMatcher(Matcher):
 
 if __name__ == "__main__":
     print("This is a module, import it in your own script and run it!")
-    mat = Matcher(
-        keep_special=True,
-        keep_unique=True
-    )
-    mat.add_pat("Aneesh")
-    mat.add_pat("aneesh1701")
-    print(mat)
+    exit(-1)

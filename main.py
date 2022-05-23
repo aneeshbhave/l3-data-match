@@ -1,15 +1,18 @@
 from pytterns import *
 
 def main():
-    mat = FMatcher(keep_special=True,
-    keep_unique=True)
-    
-    mat.f_add_pat("./Data/TRUTH.TXT", ' ')
-    mat.dir_match_pat("./Data/TextBlobs700/", format_func)
+    mat = FMatcher(
+        keep_special=True,
+        keep_unique=True
+        )
 
-def format_func(*args):
-    #print(f"{found_pattern} found from {start_idx} to {end_idx + 1} in {file_path}\nText : {found_data}")
-    print(*args)
+    mat.f_add_pat("./Data/TRUTH.TXT", pad=' ')
+    #mat.f_add_pat("./Data/TRUTH.TXT")
+    print(mat.patterns)
+    mat.dir_match_pat("./Data/TextBlobs3000/", format_func)
+
+def format_func(pattern_found, i, j, e, f):
+    print(f"{f}\t{pattern_found}\t{i}\t{j}\t{e}")
 
 if __name__ == "__main__":
     main()
