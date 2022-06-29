@@ -2,11 +2,8 @@ import ahocorasick
 from os import listdir
 from os.path import isdir, isfile, join
 
-#TODO Add Comments
-#TODO Add DocStrings
-
 class Matcher:
-    patterns :list
+    patterns :any
     keep_special :bool
     keep_unique :bool
 
@@ -16,7 +13,7 @@ class Matcher:
     SPECIAL = 'S'
 
     def __init__(self, *, keep_special :bool, keep_unique :bool):
-        self.patterns = []
+        self.patterns = set() if keep_unique else []
         self.keep_special = keep_special
         self.keep_unique = keep_unique
 
@@ -62,11 +59,8 @@ class Matcher:
                 pat += c if self.keep_special else self.SPECIAL
                 continue
         return pat
-    
-    def __rm_duplicates__(self):
-        self.patterns = list(set(self.patterns))
 
-
+#TODO Rewrite this godforsaken class
 class FMatcher(Matcher):
     def __init__(self, *, keep_special :bool, keep_unique :bool):
         super().__init__(
@@ -75,7 +69,6 @@ class FMatcher(Matcher):
             )
     
     def f_add_pat(self, f_path :str, pad :str = '') -> None:
-        """Hello world"""
         lines = self.__f_get_data__(f_path, True)
         for line in lines:
             self.add_pat(line, pad)
