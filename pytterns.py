@@ -6,12 +6,6 @@ from os.path import isdir, isfile, join
 #TODO Add DocStrings
 
 class Matcher:
-    """
-    Matcher class with basic functionality to add patterns and search them in strings.
-
-    keep_special : Keep special characters instead of replacing them with SPECIAL constant
-    keep_unique : Remove duplicates when adding pattern
-    """
     patterns :list
     keep_special :bool
     keep_unique :bool
@@ -30,19 +24,9 @@ class Matcher:
         return str(self.patterns)
 
     def add_pat(self, inp :str, pad :str = '') -> None:
-        """
-        Convert a string to a matchable pattern and add it to the internal patterns list
-
-        pad : Pad input string with string i.e inp -> pad + inp + pad 
-        """
         self.patterns.append(self.__to_pat__(pad + inp + pad))
 
     def match_pat(self, haystack :str, callback_func, file_name) -> None:
-        """
-        Find patterns in haysack. Patterns are obtained from the internal patterns array
-        
-        callback_function params := pattern_found, start_idx, end_idx, element_found
-        """
         if not len(self.patterns):
             return
 
@@ -84,14 +68,6 @@ class Matcher:
 
 
 class FMatcher(Matcher):
-    """
-    FMatcher class adds wrapper functions to interact with files.
-
-    Inherits from Matcher class
-
-    keep_special : Keep special characters instead of replacing them with SPECIAL constant
-    keep_unique : Remove duplicates when adding pattern
-    """
     def __init__(self, *, keep_special :bool, keep_unique :bool):
         super().__init__(
             keep_special=keep_special,
@@ -114,21 +90,11 @@ class FMatcher(Matcher):
             self.f_add_pat(file, pad)
     
     def f_match_pat(self, f_path :str, callback_func) -> None:
-        """#TODO Write this again
-        Find patterns in haysack. Patterns are obtained from the internal patterns array
-        
-        callback_function params := pattern_found, start_idx, end_idx, element_found
-        """
         data = self.__f_get_data__(f_path, False)
 
         self.match_pat(data, callback_func, f_path)
     
     def dir_match_pat(self, dir_path :str, callback_func) -> None:
-        """#TODO Write this again
-        Find patterns in haysack. Patterns are obtained from the internal patterns array
-        
-        callback_function params := pattern_found, start_idx, end_idx, element_found
-        """
         files = self.__dir_ls__(dir_path)
         
         for file in files:
