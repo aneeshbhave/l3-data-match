@@ -3,25 +3,23 @@ from os import listdir
 from os.path import isdir, isfile, join
 
 class Matcher:
-    patterns :any
+    patterns     :set
     keep_special :bool
-    keep_unique :bool
 
     ALPHABET = 'A'
     NUMERICAL = 'N'
     SPACE = 'W'
     SPECIAL = 'S'
 
-    def __init__(self, *, keep_special :bool, keep_unique :bool):
-        self.patterns = set() if keep_unique else []
+    def __init__(self, *, keep_special :bool):
+        self.patterns = set() 
         self.keep_special = keep_special
-        self.keep_unique = keep_unique
 
     def __repr__(self):
         return str(self.patterns)
 
     def add_pat(self, inp :str, pad :str = '') -> None:
-        self.patterns.append(self.__to_pat__(pad + inp + pad))
+        self.patterns.add(self.__to_pat__(pad + inp + pad))
 
     def match_pat(self, haystack :str, callback_func, file_name) -> None:
         if not len(self.patterns):
@@ -33,7 +31,8 @@ class Matcher:
         pat_haystack = self.__to_pat__(haystack)
         aho = ahocorasick.Automaton()
 
-        for idx, val in enumerate(self.patterns):
+        pats = list(self.patterns)
+        for idx, val in enumerate(pats):
             aho.add_word(val, (idx, val))
         
         aho.make_automaton()
@@ -41,7 +40,7 @@ class Matcher:
         for j, (idx, val) in aho.iter(pat_haystack):
             j += 1
             i = j - len(val)
-            callback_func(self.patterns[idx], i, j, haystack[i:j], {file_name})
+            callback_func(pats[idx], i, j, haystack[i:j], {file_name}) 
 
     def __to_pat__(self, inp :str) -> str:
         pat = ""
@@ -59,29 +58,37 @@ class Matcher:
                 pat += c if self.keep_special else self.SPECIAL
                 continue
         return pat
-
-#TODO Rewrite this godforsaken class
+    
 class FMatcher(Matcher):
-    def __init__(self, *, keep_special :bool, keep_unique :bool):
+    def __init__(self, *, keep_special :bool):
         super().__init__(
             keep_special=keep_special,
-            keep_unique=keep_unique
             )
     
+    def smart_add_pat(self, path :str, pad :str = ''):
+        if isdir(path):
+            self.dir_add_pat(path, pad)
+            return
+        self.f_add_pat(path, pad)
+        
     def f_add_pat(self, f_path :str, pad :str = '') -> None:
         lines = self.__f_get_data__(f_path, True)
         for line in lines:
             self.add_pat(line, pad)
 
-        if self.keep_unique:
-            self.__rm_duplicates__()
-    
     def dir_add_pat(self, dir_path :str, pad :str = '') -> None:
         files = self.__dir_ls__(dir_path)
 
         for file in files:
             self.f_add_pat(file, pad)
-    
+
+    def smart_match_pat(self, path :str, callback_func):
+        if isdir(path):
+            self.dir_match_pat(path, callback_func)
+            return
+        self.f_match_pat(path, callback_func)
+        
+
     def f_match_pat(self, f_path :str, callback_func) -> None:
         data = self.__f_get_data__(f_path, False)
 
