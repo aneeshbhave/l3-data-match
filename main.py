@@ -1,18 +1,23 @@
 #!/usr/bin/python
 
 from pytterns import FMatcher
-import getopt, sys
+import getopt, sys, json
+
+SETTINGS_FILE = "./settings.json"
 
 def main():
     dict_path, match_path, output_file = "", "", ""         #Strings with no value
-    pad_str = ' '                                           #Strings with proprietary default value
 
-    keep_special, training, is_raw = False, False, False    #Booleans
+    training, is_raw = False, False                         #Booleans
+
+    #JSON Setting Variables
+    pad_str = ' '
+    keep_special = False 
     
     argv = sys.argv[1:]
 
     try:
-        opts, args = getopt.getopt(argv, "d:m:o:p:str")
+        opts, args = getopt.getopt(argv, "d:m:o:tr")
     except getopt.GetoptError as err:
         print(err)
 
@@ -32,6 +37,14 @@ def main():
             training = True
         elif opt in ["-r"]:
             is_raw = True
+    
+    #Parse settings from SETTINGS_FILE
+    settings = None 
+    with open(SETTINGS_FILE) as f:
+        settings = json.load(f)
+        pad_str = settings["pad_str"]
+        keep_special = settings["keep_special"]
+    print(settings)
 
     #!DEBUG PRINT
     print("DEBUG PRINT", dict_path, match_path, output_file, pad_str, keep_special, training, is_raw, "", sep=f"\n{'-' * 15}\n")
@@ -43,7 +56,13 @@ def main():
         sys.stdout = open(output_file, "w")
 
     #Fetching patterns
-    mat.smart_add_pat(dict_path, pad_str)
+    if is_raw:
+        lines = mat.__f_get_data__(dict_path, True) #Read data from file as list
+        for line in lines:
+            mat.patterns.add(line)
+    else:
+        mat.smart_add_pat(dict_path, pad_str)
+
     if training:
         for p in sorted(mat.patterns):
             print(p)
@@ -51,7 +70,6 @@ def main():
     
     #Matching patterns
     mat.smart_match_pat(match_path, format_func)
-
     
     sys.stdout.close()
 
@@ -59,8 +77,6 @@ def main():
 def format_func(pattern_found, i, j, e, f):
     print(f"{f}\t{pattern_found}\t{i}\t{j}\t{e}")
 
-def resolve_path(path :str):
-    ...
 
 if __name__ == "__main__":
     main()
