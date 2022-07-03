@@ -2,13 +2,13 @@
 from pytterns import FMatcher
 import getopt, sys, json
 
-#*                       TODO Table                       *#
+#*---------------------- TODO Table ----------------------*#
 #TODO:> Improve error handling
 #TODO:> Print errors to STDERR instead of STDOUT
 #TODO:> Add Verbose output mode
 #TODO:> Improve format for generated dict files
 #TODO:> Write a better README.md
-#*                                                       *#
+#*-------------------------------------------------------*#
 
 SETTINGS_FILE = "./settings.json"
 
