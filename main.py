@@ -11,6 +11,16 @@ import getopt, json, sys, os
 
 SETTINGS_FILE = "./settings.json"
 
+# def profiler():
+#     import cProfile, pstats
+
+#     with cProfile.Profile() as pr:
+#         main()
+
+#     stats = pstats.Stats(pr)
+#     stats.sort_stats(pstats.SortKey.TIME)
+#     stats.dump_stats(filename="profiling.prof")
+
 def main():
     dict_path, match_path, output_file = "", "", ""         #Strings with no value
 
@@ -122,3 +132,4 @@ def write_preproc_data(data :set, fpath :str, keep_special :bool):
 
 if __name__ == "__main__":
     main()
+    # profiler()

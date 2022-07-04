@@ -1,6 +1,6 @@
 CC=gcc
 CCACHE_DIR=/home/aneesh/.cache/Nuitka/ccache
-CCACHE_LOGFILE=/home/aneesh/Code/l3-pattern-match/main.build/ccache-71688.txt
+CCACHE_LOGFILE=/home/aneesh/Code/l3-pattern-match/main.build/ccache-45673.txt
 CCCOM=$CC -o $TARGET -c $CFLAGS $CCFLAGS $_CCCOMCOM $SOURCES
 CFILESUFFIX=.c
 CPPDEFINES=['__NUITKA_NO_ASSERT__', '_NUITKA_CONSTANTS_FROM_INCBIN', '_NUITKA_FROZEN=0', '_NUITKA_EXE']
